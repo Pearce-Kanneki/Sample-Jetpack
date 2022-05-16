@@ -1,15 +1,12 @@
 package com.kanneki.room
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.toMutableStateList
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kanneki.room.data.data_source.ShowDataDatabase
 import com.kanneki.room.data.repository.ShowDataRepositoryIml
 import com.kanneki.room.domain.model.ShowData
 import com.kanneki.room.domain.repository.ShowDataRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -17,7 +14,9 @@ class MainViewModel(
     private val repository: ShowDataRepository = ShowDataRepositoryIml()
 ): ViewModel() {
 
-    var items = mutableStateListOf<ShowData>()
+    val items = mutableStateListOf<ShowData>()
+    var showDialog = mutableStateOf(false)
+    var selectData = mutableStateOf<ShowData?>(null)
 
     init {
         searchData()
@@ -26,6 +25,7 @@ class MainViewModel(
     fun searchData() {
         viewModelScope.launch {
             repository.getData().collectLatest {
+                items.clear()
                 items.addAll(it)
             }
         }
@@ -41,10 +41,19 @@ class MainViewModel(
                     }
                 }
             }
+            is Event.Delete -> {
+                viewModelScope.launch {
+                    selectData.value?.let {
+                        repository.deleteData(it)
+                        searchData()
+                    }
+                }
+            }
         }
     }
 }
 
 sealed class Event {
     object Add: Event()
+    object Delete: Event()
 }
