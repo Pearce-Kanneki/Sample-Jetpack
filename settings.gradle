@@ -16,3 +16,4 @@ rootProject.name = "Sample Jetpack"
 include ':DataStore'
 include ':Room'
 include ':Room And Hilt'
+include ':workmanager'
