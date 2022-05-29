@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Result API</string>
+    <string name="change_page">換頁</string>
+    <string name="permission">權限詢問</string>
+</resources>
